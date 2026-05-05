@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watermark PDF — iMissPDF Smart System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #6b7280; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+        .back-link:hover { color: #1e40af; }
+        .tool-workspace-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); margin-bottom: 24px; }
+        .tool-workspace-card h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.75rem; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        .tool-desc { color: #6b7280; margin-bottom: 24px; font-size: 0.9375rem; line-height: 1.6; }
+
+        .upload-zone { border: 2px dashed #d1d5db; border-radius: 14px; padding: 36px 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; background: #fafbfc; margin-bottom: 20px; }
+        .upload-zone:hover, .upload-zone.drag-over { border-color: #3b82f6; background: #eff6ff; }
+        .upload-zone.has-file { border-style: solid; border-color: #10b981; background: #f0fdf4; }
+        .upload-icon-wrap { width: 48px; height: 48px; background: #eff6ff; color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+        .upload-text h3 { font-size: 1rem; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+        .upload-text p { font-size: 0.8125rem; color: #6b7280; }
+
+        .file-list { margin-bottom: 20px; }
+        .file-item { display: flex; align-items: center; justify-content: space-between; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px 16px; }
+        .file-info { display: flex; align-items: center; gap: 12px; }
+        .file-icon { width: 36px; height: 36px; background: #fee2e2; color: #ef4444; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .file-name { font-size: 0.875rem; font-weight: 500; color: #0f172a; }
+        .file-size { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
+        .file-remove { width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; color: #9ca3af; cursor: pointer; font-size: 1.25rem; transition: all 0.2s; }
+        .file-remove:hover { background: #fee2e2; color: #ef4444; }
+
+        .options-panel { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .options-panel h4 { font-size: 0.9375rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .form-row.full { grid-template-columns: 1fr; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.8125rem; font-weight: 600; color: #374151; }
+        .form-group input, .form-group select { padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.875rem; outline: none; background: #ffffff; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.08); }
+
+        /* Range slider */
+        .slider-group { margin-bottom: 16px; }
+        .slider-group label { font-size: 0.8125rem; font-weight: 600; color: #374151; display: flex; justify-content: space-between; align-items: center; }
+        .slider-group label span { font-weight: 500; color: #3b82f6; }
+        .slider-group input[type="range"] { width: 100%; margin-top: 6px; accent-color: #3b82f6; }
+
+        /* Toggle */
+        .toggle-group { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
+        .toggle-group span { font-size: 0.8125rem; font-weight: 600; color: #374151; }
+        .toggle-switch { position: relative; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #d1d5db; border-radius: 24px; transition: all 0.2s; }
+        .toggle-slider::before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: all 0.2s; }
+        .toggle-switch input:checked + .toggle-slider { background: #3b82f6; }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        .radio-row { display: flex; gap: 8px; margin-bottom: 16px; }
+        .radio-pill { flex: 1; text-align: center; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; font-size: 0.8125rem; font-weight: 500; color: #6b7280; transition: all 0.2s; background: #ffffff; }
+        .radio-pill:hover { border-color: #bfdbfe; }
+        .radio-pill.active { border-color: #3b82f6; background: #eff6ff; color: #1e40af; font-weight: 600; }
+        .radio-pill input { display: none; }
+        .page-range { display: flex; align-items: center; gap: 10px; }
+        .page-range span { font-size: 0.8125rem; color: #6b7280; }
+        .page-range input { width: 70px; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.8125rem; text-align: center; outline: none; }
+        .page-range input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.08); }
+
+        .btn-process { width: 100%; padding: 14px 28px; background: #1e40af; color: white; border: none; border-radius: 10px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+        .btn-process:hover { background: #1e3a8a; box-shadow: 0 4px 16px rgba(30,64,175,0.25); }
+        .btn-process:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+        .progress-wrap { display: none; margin-top: 24px; }
+        .progress-wrap.show { display: block; }
+        .progress-bar { background: #e5e7eb; border-radius: 10px; height: 6px; overflow: hidden; position: relative; }
+        .progress-bar::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%); animation: shimmer 2s infinite; z-index: 1; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #1e40af, #3b82f6); border-radius: 10px; width: 0%; position: relative; z-index: 0; }
+        .progress-text { font-size: 0.8125rem; color: #6b7280; margin-top: 10px; text-align: center; transition: opacity 0.3s ease; }
+        .error-msg { display: none; margin-top: 12px; padding: 12px 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; font-size: 0.875rem; }
+        .error-msg.show { display: block; }
+    </style>
+</head>
+<body class="page-light">
+    <header class="header" id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="../index.html" class="logo">
+                    <span class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1"/><path d="M16 16a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1"/><path d="M21 6a2 2 0 0 0-.586-1.414l-2-2A2 2 0 0 0 17 2h-3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1z"/></svg></span>
+                    <span class="logo-text">iMissPDF<span class="logo-dot"></span></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <a href="../tools.html" class="nav-link active">Tools</a>
+                    <a href="../about.html" class="nav-link">About</a>
+                    <a href="../contact.html" class="nav-link">Contact</a>
+                </div>
+                <a href="../tools.html" class="btn btn-primary btn-sm">Open Dashboard</a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><span></span><span></span><span></span></button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-content">
+        <div class="container" style="max-width: 700px;">
+            <div class="tool-page-header">
+                <a href="../tools.html" class="back-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                    Back to Dashboard
+                </a>
+            </div>
+            <div class="tool-workspace-card">
+                <h1>Watermark PDF</h1>
+                <p class="tool-desc">Add a custom text watermark to protect and brand your PDF documents.</p>
+
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="fileInput" accept=".pdf" hidden>
+                    <div class="upload-icon-wrap"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                    <div class="upload-text"><h3>Click to upload or drag & drop</h3><p>Accepted: PDF files</p></div>
+                </div>
+
+                <div class="file-list" id="fileList"></div>
+
+                <div id="watermarkOptions" style="display:none;">
+                    <div class="options-panel">
+                        <h4>Watermark Settings</h4>
+                        <div class="form-group" style="margin-bottom:16px;">
+                            <label for="watermarkText">Watermark Text</label>
+                            <input type="text" id="watermarkText" value="CONFIDENTIAL" placeholder="Enter watermark text">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fontFamily">Font</label>
+                                <select id="fontFamily">
+                                    <option value="Arial">Arial</option>
+                                    <option value="Arial Unicode MS">Arial Unicode MS</option>
+                                    <option value="Verdana">Verdana</option>
+                                    <option value="Courier">Courier</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Comic Sans MS">Comic Sans MS</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="position">Position</label>
+                                <select id="position">
+                                    <option value="middle">Center</option>
+                                    <option value="top">Top</option>
+                                    <option value="bottom">Bottom</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="toggle-group">
+                            <span>Mosaic (repeat across page)</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="mosaic">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="slider-group">
+                            <label>Transparency <span id="transparencyValue">50%</span></label>
+                            <input type="range" id="transparency" min="0" max="100" value="50">
+                        </div>
+
+                        <div class="slider-group">
+                            <label>Rotation <span id="rotationValue">45°</span></label>
+                            <input type="range" id="rotation" min="0" max="360" value="45">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:16px;">
+                            <label>Pages</label>
+                            <div class="page-range">
+                                <span>From</span>
+                                <input type="number" id="pageFrom" min="1" value="1">
+                                <span>to</span>
+                                <input type="number" id="pageTo" min="1" value="1" placeholder="end">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Layer</label>
+                            <div class="radio-row">
+                                <label class="radio-pill active" id="layerAbove">
+                                    <input type="radio" name="layer" value="above" checked>Over the PDF
+                                </label>
+                                <label class="radio-pill" id="layerBelow">
+                                    <input type="radio" name="layer" value="below">Below the PDF
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="error-msg" id="errorMsg"></div>
+                <button class="btn-process" id="processBtn" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg>
+                    Add Watermark
+                </button>
+
+                <div class="progress-wrap" id="progressWrap">
+                    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                    <p class="progress-text" id="progressText">Processing...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" style="margin-top:0;">
+        <div class="container"><div class="footer-bottom"><p>© 2026 iMissPDF • All rights reserved.</p></div></div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const processBtn = document.getElementById('processBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const progressWrap = document.getElementById('progressWrap');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const watermarkOptions = document.getElementById('watermarkOptions');
+        
+        const watermarkText = document.getElementById('watermarkText');
+        const fontFamily = document.getElementById('fontFamily');
+        const position = document.getElementById('position');
+        const mosaic = document.getElementById('mosaic');
+        const transparency = document.getElementById('transparency');
+        const transparencyValue = document.getElementById('transparencyValue');
+        const rotation = document.getElementById('rotation');
+        const rotationValue = document.getElementById('rotationValue');
+        const pageFrom = document.getElementById('pageFrom');
+        const pageTo = document.getElementById('pageTo');
+        const layerAbove = document.getElementById('layerAbove');
+        const layerBelow = document.getElementById('layerBelow');
+        
+        let selectedFile = null;
+
+        // Sliders
+        transparency.addEventListener('input', () => transparencyValue.textContent = transparency.value + '%');
+        rotation.addEventListener('input', () => rotationValue.textContent = rotation.value + '°');
+
+        layerAbove.addEventListener('click', () => { layerAbove.classList.add('active'); layerBelow.classList.remove('active'); document.querySelector('input[name="layer"][value="above"]').checked = true; });
+        layerBelow.addEventListener('click', () => { layerBelow.classList.add('active'); layerAbove.classList.remove('active'); document.querySelector('input[name="layer"][value="below"]').checked = true; });
+
+        // Upload
+        uploadZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => { if(e.target.files[0]) { selectedFile = e.target.files[0]; renderFileList(); } fileInput.value = ''; });
+        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+        uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.classList.remove('drag-over'); if(e.dataTransfer.files[0]) { selectedFile = e.dataTransfer.files[0]; renderFileList(); } });
+
+        function formatFileSize(bytes) { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]; }
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            if (selectedFile) {
+                uploadZone.classList.add('has-file');
+                const item = document.createElement('div'); item.className = 'file-item';
+                item.innerHTML = `<div class="file-info"><div class="file-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="file-name">${selectedFile.name}</div><div class="file-size">${formatFileSize(selectedFile.size)}</div></div></div><button class="file-remove">×</button>`;
+                item.querySelector('.file-remove').addEventListener('click', () => { selectedFile = null; renderFileList(); });
+                fileList.appendChild(item);
+                processBtn.disabled = false; watermarkOptions.style.display = 'block';
+            } else { uploadZone.classList.remove('has-file'); processBtn.disabled = true; watermarkOptions.style.display = 'none'; }
+        }
+
+        function showError(msg) { errorMsg.textContent = msg; errorMsg.classList.add('show'); setTimeout(() => errorMsg.classList.remove('show'), 5000); }
+        function animateProgress(targetPercent, duration = 800) {
+            return new Promise(resolve => {
+                const currentWidth = parseFloat(progressFill.style.width) || 0;
+                const startTime = performance.now();
+                function step(timestamp) { const elapsed = timestamp - startTime; const progress = Math.min(elapsed / duration, 1); const eased = 1 - Math.pow(1 - progress, 3); progressFill.style.width = (currentWidth + (targetPercent - currentWidth) * eased) + '%'; if (progress < 1) requestAnimationFrame(step); else { progressFill.style.width = targetPercent + '%'; resolve(); } }
+                requestAnimationFrame(step);
+            });
+        }
+        async function setProgress(percent, message, duration = 800) { progressText.textContent = message; await animateProgress(percent, duration); }
+
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) { showError('Please select a PDF file.'); return; }
+            processBtn.style.display = 'none'; uploadZone.style.pointerEvents = 'none'; uploadZone.style.opacity = '0.5'; progressWrap.classList.add('show'); progressFill.style.width = '0%'; await new Promise(r => setTimeout(r, 200));
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('text', watermarkText.value || 'CONFIDENTIAL');
+            formData.append('font_family', fontFamily.value);
+            
+            // Position
+            const posMap = { top: 'top', middle: 'middle', bottom: 'bottom' };
+            formData.append('vertical_position', posMap[position.value] || 'middle');
+            
+            formData.append('mosaic', mosaic.checked ? 'true' : 'false');
+            formData.append('transparency', transparency.value);
+            formData.append('rotation', rotation.value);
+            
+            // Pages
+            const from = pageFrom.value || '1';
+            const to = pageTo.value || '';
+            if (to && parseInt(to) >= parseInt(from)) {
+                formData.append('pages', `${from}-${to}`);
+            } else if (from === '1' && !to) {
+                formData.append('pages', 'all');
+            } else {
+                formData.append('pages', `${from}-${from}`);
+            }
+            
+            formData.append('layer', document.querySelector('input[name="layer"]:checked').value);
+
+            try {
+                await setProgress(30, 'Uploading PDF...', 900);
+                await setProgress(55, 'Adding watermark...', 1200);
+                await setProgress(75, 'Processing...', 800);
+                
+                const response = await fetch('/api/watermark', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error('Watermark failed');
+                
+                await setProgress(90, 'Downloading...', 500);
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const contentDisposition = response.headers.get('Content-Disposition');
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename="(.+)"/);
+                    if (match) a.download = match[1];
+                }
+                if (!a.download) a.download = selectedFile.name.replace('.pdf','') + '_watermarked.pdf';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); window.URL.revokeObjectURL(url);
+                
+                await setProgress(100, '✓ Watermark added successfully!', 400);
+                await new Promise(r => setTimeout(r, 2500));
+                progressWrap.classList.remove('show'); progressFill.style.width = '0%'; processBtn.style.display = 'flex'; uploadZone.style.pointerEvents = 'auto'; uploadZone.style.opacity = '1'; selectedFile = null; renderFileList();
+            } catch (error) {
+                progressFill.style.width = '100%'; progressFill.style.background = '#ef4444'; progressText.textContent = '✕ ' + (error.message || 'Error.');
+                await new Promise(r => setTimeout(r, 3000)); progressWrap.classList.remove('show'); progressFill.style.width = '0%'; progressFill.style.background = 'linear-gradient(135deg, #1e40af, #3b82f6)'; processBtn.style.display = 'flex'; uploadZone.style.pointerEvents = 'auto'; uploadZone.style.opacity = '1'; showError(error.message || 'Error.');
+            }
+        });
+    </script>
+</body>
+</html>

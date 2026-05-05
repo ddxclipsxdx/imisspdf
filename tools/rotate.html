@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotate PDF — iMissPDF Smart System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #6b7280; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+        .back-link:hover { color: #1e40af; }
+        .tool-workspace-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); margin-bottom: 24px; }
+        .tool-workspace-card h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.75rem; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        .tool-desc { color: #6b7280; margin-bottom: 24px; font-size: 0.9375rem; line-height: 1.6; }
+
+        .upload-zone { border: 2px dashed #d1d5db; border-radius: 14px; padding: 40px 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; background: #fafbfc; margin-bottom: 20px; }
+        .upload-zone:hover, .upload-zone.drag-over { border-color: #3b82f6; background: #eff6ff; }
+        .upload-zone.has-file { border-style: solid; border-color: #10b981; background: #f0fdf4; }
+        .upload-icon-wrap { width: 52px; height: 52px; background: #eff6ff; color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+        .upload-text h3 { font-size: 1rem; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+        .upload-text p { font-size: 0.8125rem; color: #6b7280; }
+
+        .file-list { margin-bottom: 20px; }
+        .file-item { display: flex; align-items: center; justify-content: space-between; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 18px; }
+        .file-info { display: flex; align-items: center; gap: 12px; }
+        .file-icon { width: 40px; height: 40px; background: #fee2e2; color: #ef4444; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .file-name { font-size: 0.875rem; font-weight: 500; color: #0f172a; }
+        .file-size { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
+        .file-remove { width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; color: #9ca3af; cursor: pointer; font-size: 1.25rem; transition: all 0.2s; }
+        .file-remove:hover { background: #fee2e2; color: #ef4444; }
+
+        .options-panel { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .options-panel h4 { font-size: 0.9375rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+
+        .preview-area { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 24px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 16px; }
+        .preview-page { width: 180px; height: 240px; background: #f1f5f9; border: 2px solid #e5e7eb; border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: transform 0.4s ease; }
+        .preview-page.rotate-90 { transform: rotate(90deg); }
+        .preview-page.rotate-180 { transform: rotate(180deg); }
+        .preview-page.rotate-270 { transform: rotate(-90deg); }
+        .preview-content { text-align: center; color: #6b7280; font-size: 0.75rem; }
+        .preview-content .page-icon { font-size: 2.5rem; margin-bottom: 8px; }
+        .preview-label { text-align: center; font-size: 0.75rem; font-weight: 600; color: #374151; margin-top: 8px; }
+
+        .rotation-controls { display: flex; align-items: center; justify-content: center; gap: 16px; }
+        .rotate-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #e5e7eb; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; color: #374151; }
+        .rotate-btn:hover { border-color: #3b82f6; background: #eff6ff; color: #1e40af; }
+        .rotate-btn svg { width: 22px; height: 22px; }
+        .angle-display { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.5rem; font-weight: 700; color: #0f172a; min-width: 60px; text-align: center; }
+        .angle-label { font-size: 0.6875rem; color: #6b7280; text-align: center; }
+
+        .btn-process { width: 100%; padding: 14px 28px; background: #1e40af; color: white; border: none; border-radius: 10px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+        .btn-process:hover { background: #1e3a8a; box-shadow: 0 4px 16px rgba(30,64,175,0.25); }
+        .btn-process:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+        .progress-wrap { display: none; margin-top: 24px; }
+        .progress-wrap.show { display: block; }
+        .progress-bar { background: #e5e7eb; border-radius: 10px; height: 6px; overflow: hidden; position: relative; }
+        .progress-bar::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%); animation: shimmer 2s infinite; z-index: 1; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #1e40af, #3b82f6); border-radius: 10px; width: 0%; position: relative; z-index: 0; }
+        .progress-text { font-size: 0.8125rem; color: #6b7280; margin-top: 10px; text-align: center; transition: opacity 0.3s ease; }
+        .error-msg { display: none; margin-top: 12px; padding: 12px 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; font-size: 0.875rem; }
+        .error-msg.show { display: block; }
+    </style>
+</head>
+<body class="page-light">
+    <header class="header" id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="../index.html" class="logo">
+                    <span class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1"/><path d="M16 16a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1"/><path d="M21 6a2 2 0 0 0-.586-1.414l-2-2A2 2 0 0 0 17 2h-3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1z"/></svg></span>
+                    <span class="logo-text">iMissPDF<span class="logo-dot"></span></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <a href="../tools.html" class="nav-link active">Tools</a>
+                    <a href="../about.html" class="nav-link">About</a>
+                    <a href="../contact.html" class="nav-link">Contact</a>
+                </div>
+                <a href="../tools.html" class="btn btn-primary btn-sm">Open Dashboard</a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><span></span><span></span><span></span></button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-content">
+        <div class="container" style="max-width: 700px;">
+            <div class="tool-page-header">
+                <a href="../tools.html" class="back-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                    Back to Dashboard
+                </a>
+            </div>
+            <div class="tool-workspace-card">
+                <h1>Rotate PDF</h1>
+                <p class="tool-desc">Rotate all pages of your PDF. Click the buttons to preview the rotation before applying.</p>
+
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="fileInput" accept=".pdf" hidden>
+                    <div class="upload-icon-wrap"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></div>
+                    <div class="upload-text"><h3>Click to upload or drag & drop</h3><p>Accepted: PDF files</p></div>
+                </div>
+
+                <div class="file-list" id="fileList"></div>
+
+                <div id="rotateOptions" style="display:none;">
+                    <div class="options-panel">
+                        <h4>Rotation Preview</h4>
+
+                        <div class="preview-area">
+                            <div style="text-align:center;">
+                                <div class="preview-page" id="previewPage">
+                                    <embed id="pdfPreview" src="" type="application/pdf" style="width:100%; height:100%; display:none;">
+                                    <div class="preview-content" id="placeholderPreview">
+                                        <div class="page-icon">📄</div>
+                                        <div>Upload a PDF to preview</div>
+                                    </div>
+                                </div>
+                                <div class="preview-label" id="previewLabel">0° (no rotation)</div>
+                            </div>
+                        </div>
+
+                        <div class="rotation-controls">
+                            <button class="rotate-btn" id="rotateLeft" title="Rotate 90° left">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                            </button>
+                            <div style="text-align:center;">
+                                <div class="angle-display" id="angleDisplay">0°</div>
+                                <div class="angle-label">rotation</div>
+                            </div>
+                            <button class="rotate-btn" id="rotateRight" title="Rotate 90° right">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="error-msg" id="errorMsg"></div>
+                <button class="btn-process" id="processBtn" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                    Rotate PDF
+                </button>
+
+                <div class="progress-wrap" id="progressWrap">
+                    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                    <p class="progress-text" id="progressText">Processing...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" style="margin-top:0;">
+        <div class="container"><div class="footer-bottom"><p>© 2026 iMissPDF • All rights reserved.</p></div></div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const processBtn = document.getElementById('processBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const progressWrap = document.getElementById('progressWrap');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const rotateOptions = document.getElementById('rotateOptions');
+        const previewPage = document.getElementById('previewPage');
+        const previewLabel = document.getElementById('previewLabel');
+        const angleDisplay = document.getElementById('angleDisplay');
+        const rotateLeft = document.getElementById('rotateLeft');
+        const rotateRight = document.getElementById('rotateRight');
+        
+        let selectedFile = null;
+        let currentAngle = 0; // 0, 90, 180, 270
+
+        rotateLeft.addEventListener('click', () => {
+            currentAngle = (currentAngle - 90 + 360) % 360;
+            updatePreview();
+        });
+        rotateRight.addEventListener('click', () => {
+            currentAngle = (currentAngle + 90) % 360;
+            updatePreview();
+        });
+
+        function updatePreview() {
+            previewPage.classList.remove('rotate-90', 'rotate-180', 'rotate-270');
+            
+            if (currentAngle === 90) previewPage.classList.add('rotate-90');
+            if (currentAngle === 180) previewPage.classList.add('rotate-180');
+            if (currentAngle === 270) previewPage.classList.add('rotate-270');
+            
+            angleDisplay.textContent = currentAngle + '°';
+            const labels = {
+                0: '0° (no rotation)',
+                90: '90° clockwise',
+                180: '180° (upside down)',
+                270: '270° clockwise'
+            };
+            previewLabel.textContent = labels[currentAngle];
+        }
+
+        uploadZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => { if(e.target.files[0]) { selectedFile = e.target.files[0]; renderFileList(); } fileInput.value = ''; });
+        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+        uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.classList.remove('drag-over'); if(e.dataTransfer.files[0]) { selectedFile = e.dataTransfer.files[0]; renderFileList(); } });
+
+        function formatFileSize(bytes) { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]; }
+
+                function renderFileList() {
+            fileList.innerHTML = '';
+            if (selectedFile) {
+                uploadZone.classList.add('has-file');
+                const item = document.createElement('div'); item.className = 'file-item';
+                item.innerHTML = `<div class="file-info"><div class="file-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="file-name">${selectedFile.name}</div><div class="file-size">${formatFileSize(selectedFile.size)}</div></div></div><button class="file-remove">×</button>`;
+                item.querySelector('.file-remove').addEventListener('click', () => { selectedFile = null; renderFileList(); });
+                fileList.appendChild(item);
+                processBtn.disabled = false; rotateOptions.style.display = 'block';
+                currentAngle = 0; updatePreview();
+
+                const pdfPreview = document.getElementById('pdfPreview');
+                const placeholder = document.getElementById('placeholderPreview');
+                const url = URL.createObjectURL(selectedFile);
+                pdfPreview.src = url;
+                pdfPreview.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                uploadZone.classList.remove('has-file');
+                processBtn.disabled = true;
+                rotateOptions.style.display = 'none';
+                
+                const pdfPreview = document.getElementById('pdfPreview');
+                const placeholder = document.getElementById('placeholderPreview');
+                pdfPreview.src = '';
+                pdfPreview.style.display = 'none';
+                placeholder.style.display = 'flex';
+            }
+        }
+
+        function showError(msg) { errorMsg.textContent = msg; errorMsg.classList.add('show'); setTimeout(() => errorMsg.classList.remove('show'), 5000); }
+        function animateProgress(targetPercent, duration = 800) {
+            return new Promise(resolve => {
+                const currentWidth = parseFloat(progressFill.style.width) || 0;
+                const startTime = performance.now();
+                function step(timestamp) { const elapsed = timestamp - startTime; const progress = Math.min(elapsed / duration, 1); const eased = 1 - Math.pow(1 - progress, 3); progressFill.style.width = (currentWidth + (targetPercent - currentWidth) * eased) + '%'; if (progress < 1) requestAnimationFrame(step); else { progressFill.style.width = targetPercent + '%'; resolve(); } }
+                requestAnimationFrame(step);
+            });
+        }
+        async function setProgress(percent, message, duration = 800) { progressText.textContent = message; await animateProgress(percent, duration); }
+
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) { showError('Please select a PDF file.'); return; }
+            if (currentAngle === 0) { showError('Please rotate the page first.'); return; }
+            
+            processBtn.style.display = 'none'; uploadZone.style.pointerEvents = 'none'; uploadZone.style.opacity = '0.5'; progressWrap.classList.add('show'); progressFill.style.width = '0%'; await new Promise(r => setTimeout(r, 200));
+            
+            const formData = new FormData(); 
+            formData.append('file', selectedFile); 
+            formData.append('rotation', currentAngle.toString());
+            
+            try {
+                await setProgress(35, 'Uploading PDF...', 1000);
+                await setProgress(60, `Rotating ${currentAngle}°...`, 1500);
+                const response = await fetch('/api/rotate', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error('Rotation failed');
+                await setProgress(90, 'Downloading...', 500);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = selectedFile.name.replace('.pdf','') + '_rotated.pdf'; document.body.appendChild(a); a.click(); document.body.removeChild(a); window.URL.revokeObjectURL(url);
+                await setProgress(100, '✓ PDF rotated!', 400); await new Promise(r => setTimeout(r, 2500));
+                progressWrap.classList.remove('show'); progressFill.style.width = '0%'; processBtn.style.display = 'flex'; uploadZone.style.pointerEvents = 'auto'; uploadZone.style.opacity = '1'; selectedFile = null; renderFileList();
+            } catch (error) {
+                progressFill.style.width = '100%'; progressFill.style.background = '#ef4444'; progressText.textContent = '✕ ' + (error.message || 'Error.');
+                await new Promise(r => setTimeout(r, 3000)); progressWrap.classList.remove('show'); progressFill.style.width = '0%'; progressFill.style.background = 'linear-gradient(135deg, #1e40af, #3b82f6)'; processBtn.style.display = 'flex'; uploadZone.style.pointerEvents = 'auto'; uploadZone.style.opacity = '1'; showError(error.message || 'Error.');
+            }
+        });
+    </script>
+</body>
+</html>
