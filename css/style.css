@@ -1991,8 +1991,6 @@ body:not(.page-light)::-webkit-scrollbar-thumb:hover {
 }
 
 .split-mobile-container .range-item {
-    display: grid;
-    grid-template-columns: auto auto 52px auto 52px;
     align-items: center;
     gap: 6px;
     padding: 10px;
