@@ -1991,28 +1991,39 @@ body:not(.page-light)::-webkit-scrollbar-thumb:hover {
 }
 
 .split-mobile-container .range-item {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px;
+    gap: 10px;
+    padding: 12px;
 }
 
 .split-mobile-container .range-label {
-    font-size: 0.68rem;
-    min-width: auto;
+    min-width: 70px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #111827;
 }
 
 .split-mobile-container .range-input-group {
-    display: contents;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
 }
 
 .split-mobile-container .range-input-group span {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
+    color: #6b7280;
 }
 
 .split-mobile-container .range-input-group input {
-    width: 52px;
-    padding: 7px 6px;
-    font-size: 0.72rem;
+    width: 68px;
+    height: 42px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .split-mobile-container .checkbox-card {
