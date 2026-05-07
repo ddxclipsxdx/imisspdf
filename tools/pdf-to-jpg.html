@@ -239,7 +239,7 @@
                 await setProgress(55, currentMode === 'extract' ? 'Extracting images...' : 'Converting pages to JPG...', 1200);
                 await setProgress(75, 'Processing...', 800);
                 
-                const response = await fetch('/api/pdf-to-jpg', { method: 'POST', body: formData });
+                const response = await fetch('http://217.15.160.27:3000/api/pdf-to-jpg', { method: 'POST', body: formData });
                 if (!response.ok) throw new Error('Conversion failed');
                 
                 await setProgress(90, 'Preparing download...', 500);
@@ -274,4 +274,5 @@
     </script>
 </body>
 </html>
+
 

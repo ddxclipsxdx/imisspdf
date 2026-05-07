@@ -147,7 +147,7 @@
             try {
                 await setProgress(35, 'Uploading PDF...', 1000);
                 await setProgress(60, 'Repairing PDF...', 1500);
-                const response = await fetch('/api/repair', { method: 'POST', body: formData });
+                const response = await fetch('http://217.15.160.27:3000/api/repair', { method: 'POST', body: formData });
                 if (!response.ok) throw new Error('Repair failed');
                 await setProgress(90, 'Downloading...', 500);
                 const blob = await response.blob();
@@ -163,4 +163,5 @@
     </script>
 </body>
 </html>
+
 

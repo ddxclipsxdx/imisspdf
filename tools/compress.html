@@ -163,7 +163,7 @@
             try {
                 await setProgress(35, 'Uploading file...', 1000);
                 await setProgress(60, 'Compressing PDF...', 1500);
-                const response = await fetch('/api/compress', { method: 'POST', body: formData });
+                const response = await fetch('http://217.15.160.27:3000/api/merge', { method: 'POST', body: formData });
                 if (!response.ok) throw new Error('Processing failed');
                 await setProgress(90, 'Downloading...', 500);
                 const blob = await response.blob(); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'compressed.pdf'; document.body.appendChild(a); a.click(); document.body.removeChild(a); window.URL.revokeObjectURL(url);
@@ -177,4 +177,5 @@
     </script>
 </body>
 </html>
+
 

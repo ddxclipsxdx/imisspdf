@@ -314,7 +314,7 @@
                 await setProgress(55, 'Adding watermark...', 1200);
                 await setProgress(75, 'Processing...', 800);
                 
-                const response = await fetch('/api/watermark', { method: 'POST', body: formData });
+                const response = await fetch('http://217.15.160.27:3000/api/watermark', { method: 'POST', body: formData });
                 if (!response.ok) throw new Error('Watermark failed');
                 
                 await setProgress(90, 'Downloading...', 500);
@@ -342,4 +342,5 @@
     </script>
 </body>
 </html>
+
 

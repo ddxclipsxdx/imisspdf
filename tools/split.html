@@ -377,7 +377,7 @@
                 await setProgress(55, 'Analyzing pages...', 700);
                 await setProgress(70, 'Splitting PDF...', 1000);
                 
-                const response = await fetch('/api/split', { method: 'POST', body: formData });
+                const response = await fetch('http://217.15.160.27:3000/api/split', { method: 'POST', body: formData });
                 if (!response.ok) {
                     const err = await response.json().catch(() => ({ message: 'Processing failed' }));
                     throw new Error(err.message || 'Processing failed');
@@ -442,4 +442,5 @@
     </script>
 </body>
 </html>
+
 
