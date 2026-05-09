@@ -36,10 +36,23 @@
         navLinks.classList.remove('active');
         document.body.style.overflow = '';
     }
+    const allNavLinks = document.querySelectorAll(".nav-link");
 
-    function setActiveNavLink() {
-        const currentPath = window.location.pathname;
-        const allNavLinks = document.querySelectorAll('.nav-link');
+    allNavLinks.forEach(link => {
+        link.classList.remove("active");
+        let linkPath = link.getAttribute("href").replace(/\/$/, "");
+
+        if (linkPath === "" || linkPath === "/index.html") {
+            linkPath = "/";
+        }
+        const currentNoHtml = currentPath.replace(".html", "");
+        const linkNoHtml = linkPath.replace(".html", "");
+        if (currentNoHtml === linkNoHtml) {
+            link.classList.add("active");
+        }
+    });
+}
+        
         
         allNavLinks.forEach(link => {
             link.classList.remove('active');
