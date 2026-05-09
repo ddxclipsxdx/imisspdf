@@ -161,7 +161,7 @@
             try {
                 await setProgress(35, 'Uploading PDF...', 1000);
                 await setProgress(60, 'Encrypting with password...', 1500);
-                const response = await fetch('http://217.15.160.27:3000/api/protect', { method: 'POST', body: formData });
+                const response = await fetch('/api/protect', { method: 'POST', body: formData });
                 if (!response.ok) throw new Error('Protection failed');
                 await setProgress(90, 'Downloading...', 500);
                 const blob = await response.blob();
