@@ -527,7 +527,7 @@
                 await setProgress(60, 'Merging PDF files together...', 1200);
                 await setProgress(75, 'Optimizing merged document...', 800);
 
-                const response = await fetch('http://217.15.160.27:3000/api/merge', {
+                const response = await fetch('/api/merge', {
                     method: 'POST',
                     body: formData
                 });
