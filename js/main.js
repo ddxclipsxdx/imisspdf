@@ -1,12 +1,10 @@
 (function() {
     'use strict';
 
-    // ===== DOM Elements =====
     const header = document.getElementById('header');
     const navLinks = document.getElementById('navLinks');
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
-    // ===== Header Scroll Effect =====
     function handleScroll() {
         if (!header) return;
         
@@ -17,7 +15,6 @@
         }
     }
 
-    // ===== Mobile Menu Toggle =====
     function toggleMobileMenu() {
         if (!mobileMenuBtn || !navLinks) return;
         
@@ -32,7 +29,6 @@
         }
     }
 
-    // ===== Close Mobile Menu =====
     function closeMobileMenu() {
         if (!mobileMenuBtn || !navLinks) return;
         
@@ -41,7 +37,6 @@
         document.body.style.overflow = '';
     }
 
-    // ===== Set Active Nav Link Based on Current Page =====
     function setActiveNavLink() {
         const currentPath = window.location.pathname;
         const allNavLinks = document.querySelectorAll('.nav-link');
@@ -51,21 +46,18 @@
             
             const linkPath = link.getAttribute('href');
             
-            // Check if current page matches the link
             if (currentPath.endsWith(linkPath) || 
                 (currentPath === '/' && linkPath === 'index.html') ||
                 (currentPath.endsWith('/') && linkPath === 'index.html')) {
                 link.classList.add('active');
             }
             
-            // Handle if we're at root and link is index.html
             if ((currentPath === '/' || currentPath === '') && linkPath === 'index.html') {
                 link.classList.add('active');
             }
         });
     }
 
-    // ===== Smooth Scroll for Hash Links (on same page) =====
     function handleHashLinks(e) {
         const link = e.target.closest('a[href^="#"]');
         if (!link) return;
@@ -84,7 +76,6 @@
         }
     }
 
-    // ===== Ripple Effect on Click =====
     function createRipple(event, card) {
         // Prevent multiple ripples
         const existingRipple = card.querySelector('.ripple');
@@ -107,7 +98,6 @@
         
         card.appendChild(ripple);
         
-        // Remove ripple after animation ends
         ripple.addEventListener('animationend', () => {
             if (ripple.parentNode) {
                 ripple.remove();
@@ -115,7 +105,6 @@
         });
     }
 
-    // ===== Attach Ripple to All Tool Cards =====
     function attachRippleEffects() {
         const toolCards = document.querySelectorAll('.tool-card-light');
         
@@ -133,14 +122,12 @@
         
         e.preventDefault();
         
-        // Simple validation
         const nameInput = form.querySelector('#name');
         const emailInput = form.querySelector('#email');
         const messageInput = form.querySelector('#message');
         
         let isValid = true;
         
-        // Reset previous error states
         form.querySelectorAll('.form-group').forEach(group => {
             group.classList.remove('has-error');
         });
@@ -167,7 +154,6 @@
         }
         
         if (isValid) {
-            // Simulate form submission
             const submitBtn = form.querySelector('.btn-submit');
             if (submitBtn) {
                 const originalHTML = submitBtn.innerHTML;
@@ -199,9 +185,7 @@
         }
     }
 
-    // ===== Intersection Observer for Scroll Animations =====
     function setupScrollAnimations() {
-        // Only run on pages with animated elements
         const animatedElements = document.querySelectorAll('.tool-card-light');
         if (animatedElements.length === 0) return;
         
@@ -255,29 +239,23 @@
             }
         });
         
-        // Close mobile menu on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && navLinks && navLinks.classList.contains('active')) {
                 closeMobileMenu();
             }
         });
         
-        // Hash link smooth scroll
         document.addEventListener('click', handleHashLinks);
         
         // Form submission
         document.addEventListener('submit', handleFormSubmit);
         
-        // Attach ripple effects to cards
         attachRippleEffects();
         
-        // Set active nav on load
         setActiveNavLink();
         
-        // Setup scroll animations
         setupScrollAnimations();
         
-        // Trigger scroll handler on page load
         handleScroll();
     }
 
